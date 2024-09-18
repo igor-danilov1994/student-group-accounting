@@ -1,4 +1,4 @@
-import { CSSProperties, FC } from 'react';
+import { FC, useCallback } from 'react';
 import {
   AutoSizer,
   Column,
@@ -6,75 +6,48 @@ import {
   TableCellProps,
   TableHeaderProps,
 } from 'react-virtualized';
-import { Student } from '@/src/types';
+import { Order, Student } from '@/src/types';
 import 'react-virtualized/styles.css';
-import { StudentsTableRow } from './StudentsTableRow/StudentsTableRow';
+import { HeaderCell, RowRenderer } from '../components';
 
 interface StudentsVirtualizedTableProps {
   students: Student[];
   orderBy: keyof Student;
-  order: 'asc' | 'desc';
+  order: Order;
   onRequestSort: (property: keyof Student) => void;
 }
 
-export const StudentsVirtualizedTable: FC<StudentsVirtualizedTableProps> = ({
-  students,
-  orderBy,
-  order,
-  onRequestSort,
-}) => {
-  const headerRenderer = ({
-    label,
-    dataKey,
-    withSort = true,
-  }: TableHeaderProps & { withSort?: boolean }) => (
-    <div
-      onClick={() => onRequestSort(dataKey as keyof Student)}
-      style={{
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '8px',
-        fontWeight: 'bold',
-      }}
-    >
-      {label}
-      {withSort && (
-        <>{orderBy === dataKey && (order === 'asc' ? ' 🔼' : ' 🔽')}</>
-      )}
-    </div>
-  );
+const cellRenderer = ({ cellData }: TableCellProps) => (
+  <div
+    style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: '8px',
+      textAlign: 'center',
+    }}
+  >
+    {cellData}
+  </div>
+);
 
-  const rowRenderer = ({
-    index,
-    key,
-    style,
-  }: {
-    index: number;
-    key: string;
-    style: CSSProperties;
-  }) => {
-    const student = students[index];
-    return (
-      <div key={key} style={{ ...style, display: 'flex', width: '100%' }}>
-        <StudentsTableRow student={student} index={index} />
-      </div>
-    );
-  };
+export const StudentsVirtualizedTable: FC<
+  StudentsVirtualizedTableProps
+> = props => {
+  const { students, orderBy, order, onRequestSort } = props;
 
-  const cellRenderer = ({ cellData }: TableCellProps) => (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: '8px',
-        textAlign: 'center',
-      }}
-    >
-      {cellData}
-    </div>
+  const headerRenderer = useCallback(
+    (data: TableHeaderProps & { withSort?: boolean }) => (
+      <HeaderCell
+        label={data.label}
+        order={order}
+        orderBy={orderBy}
+        dataKey={data.dataKey}
+        onRequestSort={onRequestSort}
+        withSort={data.withSort}
+      />
+    ),
+    [order, orderBy, onRequestSort]
   );
 
   if (!students.length) {
@@ -98,7 +71,9 @@ export const StudentsVirtualizedTable: FC<StudentsVirtualizedTableProps> = ({
               height={height}
               headerHeight={40}
               rowHeight={70}
-              rowRenderer={rowRenderer}
+              rowRenderer={props => (
+                <RowRenderer {...props} students={students} />
+              )}
               rowCount={students.length}
               rowGetter={({ index }) => students[index]}
               style={{

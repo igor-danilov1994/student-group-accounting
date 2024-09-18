@@ -1,13 +1,12 @@
-import { Model } from 'miragejs';
-import { ModelDefinition } from 'miragejs/-types';
-
 export interface Student {
   id: string;
   firstName: string;
   lastName: string;
   birthYear: number;
-  status: 'учится' | 'исключен';
+  status: Status;
   idnp: string;
 }
 
-export const StudentModel: ModelDefinition<Student> = Model.extend({});
+type Status = 'учится' | 'исключен';
+
+export type Order = 'asc' | 'desc';

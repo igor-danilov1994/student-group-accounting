@@ -11,7 +11,7 @@ import React, {
 
 import dayjs from 'dayjs';
 import { Paper } from '@mui/material';
-import { Student } from '@/src/types';
+import { Order, Student } from '@/src/types';
 import { useStudents, useUrlState } from '@/src/hooks';
 import {
   Filters,
@@ -67,7 +67,7 @@ export const StudentsTable: FC = () => {
   const handleRequestSort = useCallback(
     (property: keyof Student) => {
       const isAsc = urlState?.orderBy === property && urlState?.order === 'asc';
-      const newOrder = isAsc ? 'desc' : 'asc';
+      const newOrder: Order = isAsc ? 'desc' : 'asc';
 
       updateUrlState({ orderBy: property, order: newOrder });
     },
@@ -96,7 +96,7 @@ export const StudentsTable: FC = () => {
     return sortStudents(
       filteredStudents,
       urlState?.orderBy as keyof Student,
-      urlState?.order as 'asc' | 'desc'
+      urlState?.order as Order
     );
   }, [filteredStudents, urlState]);
 

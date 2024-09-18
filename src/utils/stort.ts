@@ -1,9 +1,9 @@
-import { Student } from '@/src/types';
+import { Order, Student } from '@/src/types';
 
 export const sortStudents = (
   students: Student[],
   orderBy: keyof Student,
-  order: 'asc' | 'desc'
+  order: Order
 ): Student[] => {
   return students.sort((a, b) => {
     let comparison = 0;

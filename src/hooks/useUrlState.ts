@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import dayjs from 'dayjs';
+import { Order } from '../types';
 
 interface UrlState {
   searchTerm?: string;
   minDate?: string;
   maxDate?: string;
   orderBy?: string;
-  order?: 'asc' | 'desc';
+  order?: Order;
   page?: number;
   rowsPerPage?: number;
 }
