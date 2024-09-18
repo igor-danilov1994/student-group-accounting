@@ -1,0 +1,1 @@
+export { sortStudents } from './stort';

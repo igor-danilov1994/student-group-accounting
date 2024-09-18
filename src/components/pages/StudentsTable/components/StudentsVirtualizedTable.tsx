@@ -8,7 +8,7 @@ import {
 } from 'react-virtualized';
 import { Student } from '@/src/types';
 import 'react-virtualized/styles.css';
-import { StudentsTableRow } from '@/src/components/ui/table/StudentsTableRow/StudentsTableRow';
+import { StudentsTableRow } from './StudentsTableRow/StudentsTableRow';
 
 interface StudentsVirtualizedTableProps {
   students: Student[];
@@ -23,7 +23,11 @@ export const StudentsVirtualizedTable: FC<StudentsVirtualizedTableProps> = ({
   order,
   onRequestSort,
 }) => {
-  const headerRenderer = ({ label, dataKey }: TableHeaderProps) => (
+  const headerRenderer = ({
+    label,
+    dataKey,
+    withSort = true,
+  }: TableHeaderProps & { withSort?: boolean }) => (
     <div
       onClick={() => onRequestSort(dataKey as keyof Student)}
       style={{
@@ -31,12 +35,14 @@ export const StudentsVirtualizedTable: FC<StudentsVirtualizedTableProps> = ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '8px', // Добавляем отступ для заголовков
-        fontWeight: 'bold', // Жирный текст для заголовков
+        padding: '8px',
+        fontWeight: 'bold',
       }}
     >
       {label}
-      {orderBy === dataKey && (order === 'asc' ? ' 🔼' : ' 🔽')}
+      {withSort && (
+        <>{orderBy === dataKey && (order === 'asc' ? ' 🔼' : ' 🔽')}</>
+      )}
     </div>
   );
 
@@ -52,7 +58,7 @@ export const StudentsVirtualizedTable: FC<StudentsVirtualizedTableProps> = ({
     const student = students[index];
     return (
       <div key={key} style={{ ...style, display: 'flex', width: '100%' }}>
-        <StudentsTableRow student={student} />
+        <StudentsTableRow student={student} index={index} />
       </div>
     );
   };
@@ -63,7 +69,7 @@ export const StudentsVirtualizedTable: FC<StudentsVirtualizedTableProps> = ({
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: '8px', // Добавляем отступы для текста внутри ячеек
+        padding: '8px',
         textAlign: 'center',
       }}
     >
@@ -71,9 +77,20 @@ export const StudentsVirtualizedTable: FC<StudentsVirtualizedTableProps> = ({
     </div>
   );
 
+  if (!students.length) {
+    return 'Нет результатов';
+  }
+
   return (
     <div style={{ width: '100%' }}>
-      <div style={{ width: '100%', maxWidth: '1200px', height: '500px' }}>
+      <div
+        style={{
+          width: '100%',
+          maxWidth: '1200px',
+          height: '400px',
+          margin: 'auto',
+        }}
+      >
         <AutoSizer>
           {({ height, width }) => (
             <Table
@@ -91,57 +108,49 @@ export const StudentsVirtualizedTable: FC<StudentsVirtualizedTableProps> = ({
               }}
             >
               <Column
+                label="#"
+                headerRenderer={props =>
+                  headerRenderer({ ...props, withSort: false })
+                }
+                dataKey="index"
+                width={180}
+              />
+              <Column
                 label="Имя"
                 dataKey="firstName"
-                width={width * 0.2} // Задаем ширину колонки
+                width={150}
                 headerRenderer={headerRenderer}
                 cellRenderer={cellRenderer}
               />
               <Column
                 label="Фамилия"
                 dataKey="lastName"
-                width={width * 0.2}
+                width={180}
                 headerRenderer={headerRenderer}
                 cellRenderer={cellRenderer}
               />
               <Column
                 label="Год рождения"
                 dataKey="birthYear"
-                width={width * 0.15}
+                width={200}
                 headerRenderer={headerRenderer}
                 cellRenderer={cellRenderer}
               />
               <Column
                 label="Статус"
                 dataKey="status"
-                width={width * 0.15}
+                width={150}
                 headerRenderer={headerRenderer}
                 cellRenderer={cellRenderer}
               />
               <Column
                 label="IDNP"
                 dataKey="idnp"
-                width={width * 0.2}
+                width={200}
                 headerRenderer={headerRenderer}
                 cellRenderer={cellRenderer}
               />
-              <Column
-                width={width * 0.15}
-                label="Действия"
-                dataKey="id"
-                cellRenderer={({ rowData }) => (
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      height: '100%',
-                    }}
-                  >
-                    <StudentsTableRow student={rowData} />
-                  </div>
-                )}
-              />
+              <Column width={150} label="Действия" dataKey="id" />
             </Table>
           )}
         </AutoSizer>
